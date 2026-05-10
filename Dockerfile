@@ -4,6 +4,7 @@
 #  Based on the slim image with multi-user support, sudo, and custom tools.
 # ============================================================================
 
+# https://github.com/open-webui/open-terminal/blob/main/Dockerfile.slim
 FROM ghcr.io/open-webui/open-terminal:0.11.34-slim
 
 USER root
@@ -12,11 +13,19 @@ USER root
 RUN apt-get update && apt-get install -y --no-install-recommends \
         sudo \
         python3-pip \
-        # ── Add your custom tools below this line ──
-        kubectl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --no-cache-dir --break-system-packages pyyaml
+RUN pip3 install --no-cache-dir --break-system-packages pyyaml requests
+
+RUN ARCH=$(dpkg --print-architecture) \
+    && KUBECTL_VERSION=$(curl -fsSL https://dl.k8s.io/release/stable.txt) \
+    && curl -fsSL "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl" \
+       -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl \
+    && curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash \
+    && curl -fsSL "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${ARCH}" \
+       -o /usr/local/bin/yq && chmod +x /usr/local/bin/yq \
+    && curl -fsSL "https://github.com/regclient/regclient/releases/latest/download/regctl-linux-${ARCH}" \
+       -o /usr/local/bin/regctl && chmod +x /usr/local/bin/regctl
 
 # Passwordless sudo for the default user
 RUN echo 'user ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
