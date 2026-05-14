@@ -25,7 +25,13 @@ RUN ARCH=$(dpkg --print-architecture) \
     && curl -fsSL "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${ARCH}" \
        -o /usr/local/bin/yq && chmod +x /usr/local/bin/yq \
     && curl -fsSL "https://github.com/regclient/regclient/releases/latest/download/regctl-linux-${ARCH}" \
-       -o /usr/local/bin/regctl && chmod +x /usr/local/bin/regctl
+       -o /usr/local/bin/regctl && chmod +x /usr/local/bin/regctl \
+    && GH_VERSION=$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest \
+       | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/') \
+    && curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${ARCH}.tar.gz" \
+       | tar -xz -C /tmp \
+    && mv "/tmp/gh_${GH_VERSION}_linux_${ARCH}/bin/gh" /usr/local/bin/gh \
+    && rm -rf /tmp/gh_*
 
 # Passwordless sudo for the default user
 RUN echo 'user ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers

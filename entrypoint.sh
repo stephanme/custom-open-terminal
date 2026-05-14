@@ -63,4 +63,7 @@ fi
 export HOME="/home/user"
 export PATH="/home/user/.local/bin:${PATH}"
 
+# special configuration
+regctl registry set --tls=disabled registry.fritz.box
+
 exec open-terminal "$@"
