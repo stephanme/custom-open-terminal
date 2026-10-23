@@ -5,7 +5,7 @@
 # ============================================================================
 
 # https://github.com/open-webui/open-terminal/blob/main/Dockerfile.slim
-FROM ghcr.io/open-webui/open-terminal:0.14.2-slim
+FROM ghcr.io/open-webui/open-terminal:0.14.4-slim
 
 USER root
 
